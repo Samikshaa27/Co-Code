@@ -1,0 +1,5 @@
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+Build started...
+Build succeeded.
+Done. To undo this action, use 'ef migrations remove'

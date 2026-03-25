@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCollab | Real-Time Collaborative IDE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1117;
+            --bg-editor: #161b22;
+            --bg-navbar: #0d1117;
+            --bg-sidebar: #0d1117;
+            --accent: #58a6ff;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --highlight-string: #a5d6ff;
+            --highlight-keyword: #ff7b72;
+            --highlight-function: #d2a8ff;
+            --highlight-comment: #8b949e;
+            --online-green: #3fb950;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            height: 60px;
+            background-color: var(--bg-navbar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .room-tag {
+            background: #21262d;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--online-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--online-green);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .lang-selector {
+            background: #21262d;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .avatars {
+            display: flex;
+            margin-right: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0883e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            border: 2px solid var(--bg-navbar);
+            margin-left: -8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Editor Section */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            background: var(--bg-editor);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            width: 50px;
+            padding: 20px 0;
+            text-align: right;
+            color: #484f58;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 24px;
+            border-right: 1px solid var(--border);
+            user-select: none;
+            padding-right: 15px;
+            background: var(--bg-editor);
+        }
+
+        .editor-wrapper {
+            position: relative;
+            flex: 1;
+            height: 100%;
+        }
+
+        #editor-textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: transparent;
+            caret-color: white;
+            border: none;
+            outline: none;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 24px;
+            resize: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        #editor-highlight {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 24px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            white-space: pre;
+            pointer-events: none;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* Syntax colors */
+        .hl-keyword { color: var(--highlight-keyword); font-weight: 500; }
+        .hl-string { color: var(--highlight-string); }
+        .hl-function { color: var(--highlight-function); }
+        .hl-comment { color: var(--highlight-comment); font-style: italic; }
+
+        /* Sidebar Section */
+        .sidebar {
+            width: 320px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            padding: 0 10px;
+        }
+
+        .tab {
+            padding: 12px 15px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* User List */
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            background: #3fb950;
+            color: white;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .user-status {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Feature Card */
+        .feature-card {
+            background: #161b22;
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .feature-card p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                CodeCollab
+            </div>
+            <div class="room-tag" id="room-display">
+                <span class="status-dot"></span>
+                Room: <strong id="room-id-text">Loading...</strong>
+            </div>
+        </div>
+        <div class="nav-right">
+            <select class="lang-selector">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="html">HTML</option>
+            </select>
+            <div class="avatars" id="nav-avatars">
+                <!-- Avatars will be injected here -->
+            </div>
+            <button class="btn btn-secondary" onclick="shareRoom()">Share</button>
+            <button class="btn btn-primary" onclick="window.close()">Close</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="editor-container">
+            <div class="line-numbers" id="line-numbers">1</div>
+            <div class="editor-wrapper">
+                <div id="editor-highlight"></div>
+                <textarea id="editor-textarea" spellcheck="false" placeholder="Write code here..."></textarea>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="sidebar-tabs">
+                <div class="tab active" onclick="switchTab('suggest')">Suggest</div>
+                <div class="tab" onclick="switchTab('explain')">Explain</div>
+                <div class="tab" onclick="switchTab('debug')">Debug</div>
+                <div class="tab" onclick="switchTab('deep-debug')">Deep Debug</div>
+                <div class="tab" onclick="switchTab('users')">Users</div>
+            </div>
+
+            <div id="tab-suggest" class="tab-content active fade-in">
+                <div class="feature-card">
+                    <h4>AI Suggestion</h4>
+                    <p>Click "Suggest" to get AI-powered code improvements based on your current context.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Smart Autocomplete</h4>
+                    <p>Live suggestions appear here as you type complex logic.</p>
+                </div>
+            </div>
+
+            <div id="tab-explain" class="tab-content fade-in">
+                <div class="feature-card">
+                    <h4>Code Explanation</h4>
+                    <p>Select a block of code and press "Explain" to understand its functionality in plain English.</p>
+                </div>
+            </div>
+
+            <div id="tab-debug" class="tab-content fade-in">
+                <div class="feature-card">
+                    <h4>Debug Assistant</h4>
+                    <p>Find logical errors and syntax mistakes instantly with real-time analysis.</p>
+                </div>
+            </div>
+
+            <div id="tab-deep-debug" class="tab-content fade-in">
+                <div class="feature-card">
+                    <h4>Deep Debugging</h4>
+                    <p>Advanced trace analysis and value prediction for complex recursive algorithms.</p>
+                </div>
+            </div>
+
+            <div id="tab-users" class="tab-content fade-in">
+                <div id="user-list-container">
+                    <!-- Users will be injected here -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const roomId = new URLSearchParams(window.location.search).get('room') || 
+                      Math.random().toString(36).substring(2, 8);
+        document.getElementById('room-id-text').innerText = roomId;
+        
+        // Update URL without reload to persist room
+        if (!window.location.search.includes('room')) {
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + roomId;
+            window.history.pushState({path:newUrl},'',newUrl);
+        }
+
+        const currentUser = {
+            id: Math.random().toString(36).substring(2, 6),
+            name: 'User ' + Math.random().toString(36).substring(2, 4).toUpperCase(),
+            color: '#' + Math.floor(Math.random()*16777215).toString(16)
+        };
+
+        const participants = new Map();
+        participants.set(currentUser.id, currentUser);
+
+        // --- WebSocket for Sync (SocketsBay) ---
+        // Using a public demo API key for SocketsBay (or a generic one if available)
+        // For this demo, we'll use a public room structure.
+        const socketUrl = `wss://socketsbay.com/wss/v2/1/demo/`; 
+        let socket;
+        let isConnected = false;
+
+        function connectWebSocket() {
+            socket = new WebSocket(socketUrl);
+
+            socket.onopen = () => {
+                console.log('Connected to SocketsBay');
+                isConnected = true;
+                document.querySelector('.status-dot').style.backgroundColor = 'var(--online-green)';
+                document.getElementById('room-display').innerHTML = `<span class="status-dot"></span> Connected | Room: <strong id="room-id-text">${roomId}</strong>`;
+                
+                // Broadcast presence on join
+                sendToSocket({ type: 'PRESENCE', user: currentUser, roomId: roomId });
+                // Request other participants to announce themselves
+                sendToSocket({ type: 'REQUEST_PRESENCE', roomId: roomId });
+            };
+
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // Filter messages by Room ID to avoid cross-talk on public channel
+                    if (data.roomId !== roomId) return;
+
+                    if (data.type === 'CODE_UPDATE') {
+                        if (data.userId !== currentUser.id) {
+                            const cursorPosition = textarea.selectionStart;
+                            textarea.value = data.code;
+                            syncEditor();
+                            // Basic cursor preservation
+                            textarea.setSelectionRange(cursorPosition, cursorPosition);
+                        }
+                    } else if (data.type === 'PRESENCE') {
+                        participants.set(data.user.id, data.user);
+                        updateParticipantsUI();
+                    } else if (data.type === 'REQUEST_PRESENCE') {
+                        if (data.userId !== currentUser.id) {
+                            sendToSocket({
+                                type: 'PRESENCE',
+                                user: currentUser,
+                                roomId: roomId
+                            });
+                        }
+                    }
+                } catch (e) {
+                    // console.error("Error parsing socket message", e);
+                }
+            };
+
+            socket.onclose = () => {
+                isConnected = false;
+                document.querySelector('.status-dot').style.backgroundColor = '#ff7b72';
+                console.log('Disconnected from SocketsBay. Retrying...');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function sendToSocket(data) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify(data));
+            }
+        }
+
+        connectWebSocket();
+
+        // --- Elements ---
+        const textarea = document.getElementById('editor-textarea');
+        const highlight = document.getElementById('editor-highlight');
+        const lineNumbers = document.getElementById('line-numbers');
+        const userListContainer = document.getElementById('user-list-container');
+        const navAvatars = document.getElementById('nav-avatars');
+
+        // --- Functions ---
+
+        function updateLineNumbers() {
+            const lines = textarea.value.split('\n').length;
+            let lnHtml = '';
+            for (let i = 1; i <= lines; i++) {
+                lnHtml += i + '<br>';
+            }
+            lineNumbers.innerHTML = lnHtml;
+        }
+
+        function highlightCode(code) {
+            let hl = code
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            hl = hl.replace(/"(.*?)"/g, '<span class="hl-string">"$1"</span>');
+            hl = hl.replace(/'(.*?)'/g, '<span class="hl-string">\'$1\'</span>');
+            hl = hl.replace(/\b(print)\b/g, '<span class="hl-function">$1</span>');
+            hl = hl.replace(/\b(def|class|if|else|elif|for|while|return|import|as|from|try|except|finally|with|pass|break|continue|in|is|and|or|not|True|False|None)\b/g, '<span class="hl-keyword">$1</span>');
+            hl = hl.replace(/#(.*)/g, '<span class="hl-comment">#$1</span>');
+
+            highlight.innerHTML = hl + "\n";
+        }
+
+        function syncEditor() {
+            highlightCode(textarea.value);
+            updateLineNumbers();
+            highlight.scrollTop = textarea.scrollTop;
+            highlight.scrollLeft = textarea.scrollLeft;
+            lineNumbers.scrollTop = textarea.scrollTop;
+        }
+
+        textarea.addEventListener('input', () => {
+            syncEditor();
+            sendToSocket({
+                type: 'CODE_UPDATE',
+                code: textarea.value,
+                userId: currentUser.id,
+                roomId: roomId
+            });
+        });
+
+        textarea.addEventListener('scroll', () => {
+            highlight.scrollTop = textarea.scrollTop;
+            highlight.scrollLeft = textarea.scrollLeft;
+            lineNumbers.scrollTop = textarea.scrollTop;
+        });
+
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                textarea.value = textarea.value.substring(0, start) + "    " + textarea.value.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + 4;
+                syncEditor();
+                sendToSocket({
+                    type: 'CODE_UPDATE',
+                    code: textarea.value,
+                    userId: currentUser.id,
+                    roomId: roomId
+                });
+            }
+        });
+
+        window.switchTab = (tabName) => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const tabs = Array.from(document.querySelectorAll('.tab'));
+            const selectedTab = tabs.find(t => t.innerText.toLowerCase().includes(tabName.replace('-', ' ')));
+            if (selectedTab) selectedTab.classList.add('active');
+            const content = document.getElementById('tab-' + tabName);
+            if (content) content.classList.add('active');
+        };
+
+        function updateParticipantsUI() {
+            userListContainer.innerHTML = '';
+            navAvatars.innerHTML = '';
+            participants.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                const initial = user.name.split(' ')[1]?.[0] || 'U';
+                userItem.innerHTML = `
+                    <div class="user-avatar" style="background: ${user.color}">${initial}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.name} ${user.id === currentUser.id ? '(You)' : ''}</div>
+                        <div class="user-status">Online</div>
+                    </div>
+                `;
+                userListContainer.appendChild(userItem);
+
+                if (navAvatars.children.length < 5) {
+                    const navAvatar = document.createElement('div');
+                    navAvatar.className = 'avatar';
+                    navAvatar.style.background = user.color;
+                    navAvatar.innerText = initial;
+                    navAvatar.title = user.name;
+                    navAvatars.appendChild(navAvatar);
+                }
+            });
+        }
+
+        window.shareRoom = () => {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Room link copied! Share this URL with others to collaborate: ' + url);
+            });
+        };
+
+        updateParticipantsUI();
+        textarea.value = `def hello_world():\n    print("Welcome to CodeCollab!")\n    message = "Collaborative coding made simple."\n    print(message)\n\nhello_world()`;
+        syncEditor();
+
+        // Handle window close to notify others (optional for BC but good practice)
+        window.addEventListener('beforeunload', () => {
+            // BroadcastChannel doesn't have a reliable leave event, but we can simulate
+            // In a real WebSocket app, we'd handle disconnection.
+        });
+
+    </script>
+</body>
+</html>

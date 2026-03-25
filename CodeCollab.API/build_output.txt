@@ -1,0 +1,23 @@
+  Determining projects to restore...
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+  All projects are up-to-date for restore.
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(14,6): error CS0579: Duplicate 'DbContext' attribute [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(15,6): error CS0579: Duplicate 'Migration' attribute [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.cs(13,33): error CS0111: Type 'InitialCreate' already defines a member called 'Up' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.cs(112,33): error CS0111: Type 'InitialCreate' already defines a member called 'Down' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(19,33): error CS0111: Type 'InitialCreate' already defines a member called 'BuildTargetModel' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+
+Build FAILED.
+
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(14,6): error CS0579: Duplicate 'DbContext' attribute [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(15,6): error CS0579: Duplicate 'Migration' attribute [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.cs(13,33): error CS0111: Type 'InitialCreate' already defines a member called 'Up' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.cs(112,33): error CS0111: Type 'InitialCreate' already defines a member called 'Down' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\Data\Migrations\20260323115651_InitialCreate.Designer.cs(19,33): error CS0111: Type 'InitialCreate' already defines a member called 'BuildTargetModel' with the same parameter types [C:\Users\ADMIN\Desktop\AI Code Collaborator\CodeCollab.API\CodeCollab.API.csproj]
+    2 Warning(s)
+    5 Error(s)
+
+Time Elapsed 00:00:05.91
