@@ -2,14 +2,21 @@ const BASE = import.meta.env.VITE_API_URL || '';
 console.log('AI Backend URL:', BASE || 'LOCAL (relative)');
 
 async function request(method, path, body, token, signal = null) {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = { 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE}${path}`, {
-    method,
+  const url = `${BASE}${path}`;
+  // Force method to uppercase for consistency
+  const fetchMethod = method.toUpperCase();
+
+  const res = await fetch(url, {
+    method: fetchMethod,
     headers,
     signal,
-    body: body ? JSON.stringify(body) : undefined,
+    body: (fetchMethod !== 'GET' && body) ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {
