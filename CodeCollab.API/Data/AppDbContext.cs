@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Room>(e =>
         {
             e.HasKey(r => r.Id);
+            e.Property(r => r.Id).HasColumnType("uuid"); // Force UUID for Postgres
         });
 
         modelBuilder.Entity<Session>(e =>
@@ -26,6 +27,7 @@ public class AppDbContext : DbContext
              .WithMany(r => r.Sessions)
              .HasForeignKey(s => s.RoomId)
              .OnDelete(DeleteBehavior.Cascade);
+            e.Property(s => s.RoomId).HasColumnType("uuid");
         });
 
         modelBuilder.Entity<CodeSnapshot>(e =>
@@ -36,6 +38,7 @@ public class AppDbContext : DbContext
              .WithMany(r => r.CodeSnapshots)
              .HasForeignKey(c => c.RoomId)
              .OnDelete(DeleteBehavior.Cascade);
+            e.Property(c => c.RoomId).HasColumnType("uuid");
         });
 
         modelBuilder.Entity<AiLog>(e =>
@@ -46,6 +49,7 @@ public class AppDbContext : DbContext
              .WithMany(r => r.AiLogs)
              .HasForeignKey(a => a.RoomId)
              .OnDelete(DeleteBehavior.Cascade);
+            e.Property(a => a.RoomId).HasColumnType("uuid");
         });
     }
 }
