@@ -100,7 +100,11 @@ builder.Services.AddCors(opts =>
 {
     opts.AddPolicy("ProductionCors", policy =>
     {
-        policy.WithOrigins("https://co-code-ai.vercel.app")
+        policy.WithOrigins(
+            "https://co-code-ai.vercel.app", 
+            "http://co-code-ai.vercel.app", 
+            "https://co-code-ai.vercel.app/"
+        )
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -129,13 +133,14 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ── Middleware pipeline ───────────────────────────────────────────────────────
+app.UseCors("ProductionCors");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("ProductionCors");
 app.UseAuthentication();
 app.UseAuthorization();
 
