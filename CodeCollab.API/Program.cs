@@ -34,11 +34,11 @@ if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase) && rawConn
         var user = userInfo[0];
         var pass = userInfo.Length > 1 ? userInfo[1] : "";
         var host = uri.Host;
-        var port = uri.Port > 0 ? uri.Port : 5432;
+        var dbPort = uri.Port > 0 ? uri.Port : 5432;
         var db = uri.AbsolutePath.TrimStart('/');
         var ssl = rawConn.Contains("sslmode=require") ? "SSL Mode=Require;Trust Server Certificate=true" : "";
         
-        connectionString = $"Host={host};Port={port};Database={db};Username={user};Password={pass};{ssl}";
+        connectionString = $"Host={host};Port={dbPort};Database={db};Username={user};Password={pass};{ssl}";
         Console.WriteLine($"Database: Parsed Postgres URI for {host}");
     }
     catch (Exception ex)
