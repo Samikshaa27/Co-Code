@@ -102,19 +102,20 @@ builder.Services.AddSignalR(opts =>
 // ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(opts =>
 {
-    opts.AddDefaultPolicy(policy =>
+    opts.AddPolicy("ProductionCors", policy =>
     {
         var originsValue = builder.Configuration["AllowedOrigins"] ?? builder.Configuration["AllowedOrigin"];
         var origins = !string.IsNullOrEmpty(originsValue) 
             ? originsValue.Split(',', StringSplitOptions.RemoveEmptyEntries) 
             : new[] { "http://localhost:5173", "http://localhost:3000" };
 
-        Console.WriteLine($"CORS Policy: Allowing [{string.Join(", ", origins)}]");
+        Console.WriteLine($"CORS Policy (ProductionCors): Allowing [{string.Join(", ", origins)}]");
 
         policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10)); // Cache preflight
     });
 });
 
@@ -146,7 +147,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("ProductionCors");
 app.UseAuthentication();
 app.UseAuthorization();
 
