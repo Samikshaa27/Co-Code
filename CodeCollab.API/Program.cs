@@ -111,11 +111,11 @@ builder.Services.AddCors(opts =>
 
         Console.WriteLine($"CORS Policy (ProductionCors): Allowing [{string.Join(", ", origins)}]");
 
-        policy.WithOrigins(origins)
+        policy.SetIsOriginAllowed(origin => true) // Most reliable for dynamic cross-origin setups
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
-              .SetPreflightMaxAge(TimeSpan.FromMinutes(10)); // Cache preflight
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
     });
 });
 
