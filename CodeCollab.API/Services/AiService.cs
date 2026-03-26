@@ -111,7 +111,9 @@ public class AiService
         catch (Exception ex)
         {
             _logger.LogError(ex, "AI Suggestion failure");
-            return new AiSuggestionResult("", false, ex.Message);
+            // MASKED DIAGNOSTIC: See what key we're actually sending (first 5 chars)
+            string masked = string.IsNullOrEmpty(_apiKey) ? "MISSING" : _apiKey.Length > 5 ? _apiKey[..5] + "..." : "TOO_SHORT";
+            return new AiSuggestionResult("", false, $"[{masked}] {ex.Message}");
         }
     }
 
