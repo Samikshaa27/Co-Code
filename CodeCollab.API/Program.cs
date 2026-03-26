@@ -100,7 +100,7 @@ builder.Services.AddCors(opts =>
 {
     opts.AddPolicy("ProductionCors", policy =>
     {
-        policy.SetIsOriginAllowed(origin => true) // Matches any incoming origin (including your Vercel link)
+        policy.WithOrigins("https://co-code-ai.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
