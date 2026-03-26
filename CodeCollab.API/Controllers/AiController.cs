@@ -28,7 +28,7 @@ public class AiController : ControllerBase
             {
                  // Handle specific API key/Quota errors gracefully
                 if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
-                    return BadRequest(new { error = "AI Service is temporarily unavailable due to credential issues. Please check your API Key on Render." });
+                    return BadRequest(new { error = $"AI Service credential issue. Check API Key on Render. Detail: {result.Error}" });
                 
                 return StatusCode(500, new { error = result.Error });
             }
@@ -83,7 +83,7 @@ public class AiController : ControllerBase
             if (!result.Success)
             {
                 if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
-                    return BadRequest(new { error = "AI Service is unavailable. Check API Key credentials on Render." });
+                    return BadRequest(new { error = $"AI Service unavailable. Check API Key on Render. Detail: {result.Error}" });
                 return StatusCode(500, new { error = result.Error });
             }
             return Ok(new { issues = result.Issues });
@@ -105,7 +105,7 @@ public class AiController : ControllerBase
             if (!result.Success)
             {
                 if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
-                    return BadRequest(new { error = "Deep Debug unavailable due to API limits or invalid keys." });
+                    return BadRequest(new { error = $"AI Service credential issue. Check API Key on Render. Detail: {result.Error}" });
                 return StatusCode(500, new { error = result.Error });
             }
             return Ok(result);
