@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace CodeCollab.API.Controllers;
 
 [ApiController]
-[Route("api/ai")]
+[Route("ai")]
 public class AiController : ControllerBase
 {
     private readonly AiService _aiService;

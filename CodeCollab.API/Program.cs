@@ -165,7 +165,7 @@ app.Use(async (context, next) =>
     if (!string.IsNullOrEmpty(origin) && origin.Contains("vercel.app"))
     {
         context.Response.Headers.AccessControlAllowOrigin = origin;
-        context.Response.Headers.AccessControlAllowHeaders = "Content-Type, Authorization, Accept, X-Requested-With";
+        context.Response.Headers.AccessControlAllowHeaders = "Content-Type, Authorization, Accept, X-Requested-With, x-signalr-user-agent";
         context.Response.Headers.AccessControlAllowMethods = "GET, POST, PUT, DELETE, OPTIONS";
         context.Response.Headers.AccessControlAllowCredentials = "true";
         context.Response.Headers.Add("X-CORS-Middleware", "Active"); // EVIDENCE: Check for this in DevTools
