@@ -129,6 +129,26 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ── Middleware pipeline ───────────────────────────────────────────────────────
+
+// Manual Preflight Override (Absolute Top)
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        var origin = context.Request.Headers["Origin"].ToString();
+        if (!string.IsNullOrEmpty(origin) && origin.Contains("vercel.app"))
+        {
+            context.Response.Headers.AccessControlAllowOrigin = origin;
+            context.Response.Headers.AccessControlAllowHeaders = "*";
+            context.Response.Headers.AccessControlAllowMethods = "*";
+            context.Response.Headers.AccessControlAllowCredentials = "true";
+            context.Response.StatusCode = 204;
+            return;
+        }
+    }
+    await next();
+});
+
 app.UseCors("ProductionCors");
 
 if (app.Environment.IsDevelopment())
