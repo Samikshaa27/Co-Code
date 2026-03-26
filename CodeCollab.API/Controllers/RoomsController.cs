@@ -4,7 +4,7 @@ using CodeCollab.API.Services;
 namespace CodeCollab.API.Controllers;
 
 [ApiController]
-[Route("api/rooms")]
+[Route("rooms")]
 public class RoomsController : ControllerBase
 {
     private readonly RoomService _roomService;

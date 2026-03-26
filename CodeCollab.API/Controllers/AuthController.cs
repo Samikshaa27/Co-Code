@@ -8,7 +8,7 @@ using CodeCollab.API.Services;
 namespace CodeCollab.API.Controllers;
 
 [ApiController]
-[Route("api/auth")]
+[Route("auth")]
 public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
