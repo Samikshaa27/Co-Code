@@ -24,7 +24,14 @@ public class AiController : ControllerBase
         {
             if (!Validate(request, out var error)) return BadRequest(new { error });
             var result = await _aiService.GetSuggestionAsync(request.RoomId, request.Code, request.Language, ct);
-            if (!result.Success) return StatusCode(500, new { error = result.Error });
+            if (!result.Success) 
+            {
+                 // Handle specific API key/Quota errors gracefully
+                if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
+                    return BadRequest(new { error = "AI Service is temporarily unavailable due to credential issues. Please check your API Key on Render." });
+                
+                return StatusCode(500, new { error = result.Error });
+            }
             return Ok(new { suggestion = result.Suggestion });
         }
         catch (Exception ex)
@@ -73,7 +80,12 @@ public class AiController : ControllerBase
         {
             if (!Validate(request, out var error)) return BadRequest(new { error });
             var result = await _aiService.GetDebugFlagsAsync(request.RoomId, request.Code, request.Language, ct);
-            if (!result.Success) return StatusCode(500, new { error = result.Error });
+            if (!result.Success)
+            {
+                if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
+                    return BadRequest(new { error = "AI Service is unavailable. Check API Key credentials on Render." });
+                return StatusCode(500, new { error = result.Error });
+            }
             return Ok(new { issues = result.Issues });
         }
         catch (Exception ex)
@@ -90,7 +102,12 @@ public class AiController : ControllerBase
         {
             if (!Validate(request, out var error)) return BadRequest(new { error });
             var result = await _aiService.GetDeepDebugAsync(request.RoomId, request.Code, request.Language, ct);
-            if (!result.Success) return StatusCode(500, new { error = result.Error });
+            if (!result.Success)
+            {
+                if (result.Error?.Contains("401") == true || result.Error?.Contains("429") == true)
+                    return BadRequest(new { error = "Deep Debug unavailable due to API limits or invalid keys." });
+                return StatusCode(500, new { error = result.Error });
+            }
             return Ok(result);
         }
         catch (Exception ex)
