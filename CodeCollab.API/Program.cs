@@ -125,6 +125,27 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// ── Manual CORS Override (Top of Pipeline) ───────────────────────────────────
+app.Use(async (context, next) =>
+{
+    var origin = context.Request.Headers["Origin"].ToString();
+    if (!string.IsNullOrEmpty(origin))
+    {
+        context.Response.Headers.AccessControlAllowOrigin = origin;
+        context.Response.Headers.AccessControlAllowHeaders = "*";
+        context.Response.Headers.AccessControlAllowMethods = "*";
+        context.Response.Headers.AccessControlAllowCredentials = "true";
+    }
+
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 204;
+        await context.Response.CompleteAsync();
+        return;
+    }
+    await next();
+});
+
 // ── Migrate & seed ────────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
@@ -147,7 +168,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("ProductionCors");
 app.UseAuthentication();
 app.UseAuthorization();
 
