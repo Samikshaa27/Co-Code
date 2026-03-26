@@ -151,6 +151,25 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// ── Global Error Reveal (For Debugging) ──────────────────────────────────────
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { 
+            error = ex.Message, 
+            detail = ex.InnerException?.Message,
+            stackTrace = ex.StackTrace 
+        });
+    }
+});
+
 app.UseCors("ProductionCors");
 
 if (app.Environment.IsDevelopment())
