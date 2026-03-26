@@ -80,8 +80,10 @@ builder.Services.AddCors(opts =>
 {
     opts.AddDefaultPolicy(policy =>
     {
-        var origins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:5173", "http://localhost:3000" };
+        var originsValue = builder.Configuration["AllowedOrigins"];
+        var origins = !string.IsNullOrEmpty(originsValue) 
+            ? originsValue.Split(',', StringSplitOptions.RemoveEmptyEntries) 
+            : new[] { "http://localhost:5173", "http://localhost:3000" };
 
         policy.WithOrigins(origins)
               .AllowAnyHeader()
