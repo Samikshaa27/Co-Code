@@ -9,7 +9,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Check for API Key at startup (Step 1)
+// Check for API Key at startup
 var apiKey = builder.Configuration["Groq:ApiKey"] ?? builder.Configuration["OpenAI:ApiKey"];
 if (string.IsNullOrEmpty(apiKey))
 {
@@ -23,7 +23,6 @@ var dbProvider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
 var rawConn = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? (dbProvider == "Postgres" ? "Host=localhost;Database=codecollab;Username=postgres" : "Data Source=codecollab.db");
 
-// Convert Postgres URI to Key-Value if needed (Important for Neon/Fly/Railway)
 var connectionString = rawConn;
 if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase) && rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
 {
@@ -39,7 +38,6 @@ if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase) && rawConn
         var ssl = rawConn.Contains("sslmode=require") ? "SSL Mode=Require;Trust Server Certificate=true" : "";
         
         connectionString = $"Host={host};Port={dbPort};Database={db};Username={user};Password={pass};{ssl}";
-        Console.WriteLine($"Database: Parsed Postgres URI for {host}");
     }
     catch (Exception ex)
     {
@@ -69,7 +67,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.FromMinutes(5)
         };
-        // Allow SignalR to get token from query string
         opts.Events = new JwtBearerEvents
         {
             OnMessageReceived = ctx =>
@@ -89,13 +86,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<RoomService>();
 builder.Services.AddScoped<AiService>();
-
 builder.Services.AddHostedService<RoomCleanupService>();
 
 // ── SignalR ───────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR(opts =>
 {
-    opts.MaximumReceiveMessageSize = 5 * 1024 * 1024; // 5MB
+    opts.MaximumReceiveMessageSize = 5 * 1024 * 1024;
     opts.EnableDetailedErrors = builder.Environment.IsDevelopment();
 });
 
@@ -104,18 +100,10 @@ builder.Services.AddCors(opts =>
 {
     opts.AddPolicy("ProductionCors", policy =>
     {
-        var originsValue = builder.Configuration["AllowedOrigins"] ?? builder.Configuration["AllowedOrigin"];
-        var origins = !string.IsNullOrEmpty(originsValue) 
-            ? originsValue.Split(',', StringSplitOptions.RemoveEmptyEntries) 
-            : new[] { "http://localhost:5173", "http://localhost:3000" };
-
-        Console.WriteLine($"CORS Policy (ProductionCors): Allowing [{string.Join(", ", origins)}]");
-
-        policy.SetIsOriginAllowed(origin => true) // Most reliable for dynamic cross-origin setups
+        policy.WithOrigins("https://co-code-ai.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials()
-              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+              .AllowCredentials();
     });
 });
 
@@ -124,27 +112,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// ── Manual CORS Override (Top of Pipeline) ───────────────────────────────────
-app.Use(async (context, next) =>
-{
-    var origin = context.Request.Headers["Origin"].ToString();
-    if (!string.IsNullOrEmpty(origin))
-    {
-        context.Response.Headers.AccessControlAllowOrigin = origin;
-        context.Response.Headers.AccessControlAllowHeaders = "*";
-        context.Response.Headers.AccessControlAllowMethods = "*";
-        context.Response.Headers.AccessControlAllowCredentials = "true";
-    }
-
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 204;
-        await context.Response.CompleteAsync();
-        return;
-    }
-    await next();
-});
 
 // ── Migrate & seed ────────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
@@ -168,13 +135,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("ProductionCors");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<CollabHub>("/hubs/collab");
 
-// Health check
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5099";
