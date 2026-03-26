@@ -10,10 +10,10 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Check for API Key at startup (Step 1)
-var apiKey = builder.Configuration["OpenAI:ApiKey"];
+var apiKey = builder.Configuration["Groq:ApiKey"] ?? builder.Configuration["OpenAI:ApiKey"];
 if (string.IsNullOrEmpty(apiKey))
 {
-    Console.WriteLine("CRITICAL: OpenAI:ApiKey is missing in appsettings.json!");
+    Console.WriteLine("CRITICAL: AI API Key (Groq or OpenAI) is missing!");
     throw new InvalidOperationException("API key not configured (required for AI features).");
 }
 Console.WriteLine("AI Backend Startup: API Key found.");

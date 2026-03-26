@@ -1,4 +1,5 @@
 const BASE = import.meta.env.VITE_API_URL || '';
+console.log('AI Backend URL:', BASE || 'LOCAL (relative)');
 
 async function request(method, path, body, token, signal = null) {
   const headers = { 'Content-Type': 'application/json' };
