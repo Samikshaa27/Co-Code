@@ -43,10 +43,8 @@ public class AiService
     {
         if (string.IsNullOrEmpty(_apiKey)) throw new InvalidOperationException("AI Service: API key is not configured.");
         
-        // Use Groq if explicitly configured or if key has common Groq prefixes (gsk_ or sk_)
-        bool isGroq = !string.IsNullOrEmpty(_config["Groq:ApiKey"]) || 
-                      _apiKey.StartsWith("gsk_") || 
-                      _apiKey.StartsWith("sk_");
+        // FORCE Groq for now to bypass detection confusion
+        bool isGroq = true;
 
         if (isGroq)
         {
