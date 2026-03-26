@@ -128,7 +128,5 @@ app.MapHub<CollabHub>("/hubs/collab");
 // Health check
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-// app.Urls.Add($"http://localhost:{port}");
-
-app.Run("http://127.0.0.1:5099");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5099";
+app.Run($"http://0.0.0.0:{port}");

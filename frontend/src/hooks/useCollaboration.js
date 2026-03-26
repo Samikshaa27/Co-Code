@@ -30,7 +30,8 @@ export function useCollaboration(roomId, initialCode) {
   useEffect(() => {
     if (!roomId || !token) return;
 
-    const hubUrl = `${window.location.origin}/hubs/collab?roomId=${roomId.toLowerCase()}&displayName=${encodeURIComponent(displayName)}&color=${encodeURIComponent(color)}&sessionId=${sessionId}`;
+    const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+    const hubUrl = `${apiBase}/hubs/collab?roomId=${roomId.toLowerCase()}&displayName=${encodeURIComponent(displayName)}&color=${encodeURIComponent(color)}&sessionId=${sessionId}`;
 
     const conn = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {
