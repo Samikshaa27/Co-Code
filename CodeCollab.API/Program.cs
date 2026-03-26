@@ -20,8 +20,32 @@ Console.WriteLine("AI Backend Startup: API Key found.");
 
 // ── Database ──────────────────────────────────────────────────────────────────
 var dbProvider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+var rawConn = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? (dbProvider == "Postgres" ? "Host=localhost;Database=codecollab;Username=postgres" : "Data Source=codecollab.db");
+
+// Convert Postgres URI to Key-Value if needed (Important for Neon/Fly/Railway)
+var connectionString = rawConn;
+if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase) && rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+{
+    try 
+    {
+        var uri = new Uri(rawConn);
+        var userInfo = uri.UserInfo.Split(':');
+        var user = userInfo[0];
+        var pass = userInfo.Length > 1 ? userInfo[1] : "";
+        var host = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var db = uri.AbsolutePath.TrimStart('/');
+        var ssl = rawConn.Contains("sslmode=require") ? "SSL Mode=Require;Trust Server Certificate=true" : "";
+        
+        connectionString = $"Host={host};Port={port};Database={db};Username={user};Password={pass};{ssl}";
+        Console.WriteLine($"Database: Parsed Postgres URI for {host}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"WARNING: Failed to parse Postgres URI: {ex.Message}");
+    }
+}
 
 builder.Services.AddDbContext<AppDbContext>(opts =>
 {
