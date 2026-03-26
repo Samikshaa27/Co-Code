@@ -18,6 +18,7 @@ public class AiService
 {
     private readonly AppDbContext _db;
     private readonly ILogger<AiService> _logger;
+    private readonly IConfiguration _config;
     private readonly string _apiKey;
     
     // Models as requested
@@ -26,6 +27,9 @@ public class AiService
 
     public AiService(AppDbContext db, ILogger<AiService> logger, IConfiguration config)
     {
+        _db = db;
+        _logger = logger;
+        _config = config;
         _apiKey = config["Groq:ApiKey"] ?? config["OpenAI:ApiKey"] ?? "";
         if (string.IsNullOrEmpty(_apiKey))
         {
@@ -39,12 +43,17 @@ public class AiService
     {
         if (string.IsNullOrEmpty(_apiKey)) throw new InvalidOperationException("AI Service: API key is not configured.");
         
-        // If it's a Groq key (gsk_), we use Groq endpoint but with OpenAI SDK (OpenAI compatibility)
-        if (_apiKey.StartsWith("gsk_"))
+        // Use Groq if explicitly configured or if key has the standard Groq prefix
+        bool isGroq = !string.IsNullOrEmpty(_config["Groq:ApiKey"]) || _apiKey.StartsWith("gsk_");
+
+        if (isGroq)
         {
              var options = new OpenAIClientOptions { Endpoint = new Uri("https://api.groq.com/openai/v1") };
              var client = new OpenAIClient(new ApiKeyCredential(_apiKey), options);
-             return client.GetChatClient(model.Contains("gpt") ? "llama-3.3-70b-versatile" : model);
+             
+             // Map standard models to Groq equivalents
+             string groqModel = model.Contains("mini") ? "llama-3.1-8b-instant" : "llama-3.3-70b-versatile";
+             return client.GetChatClient(groqModel);
         }
         
         return new OpenAIClient(new ApiKeyCredential(_apiKey)).GetChatClient(model);
