@@ -80,7 +80,7 @@ builder.Services.AddCors(opts =>
 {
     opts.AddDefaultPolicy(policy =>
     {
-        var originsValue = builder.Configuration["AllowedOrigins"];
+        var originsValue = builder.Configuration["AllowedOrigins"] ?? builder.Configuration["AllowedOrigin"];
         var origins = !string.IsNullOrEmpty(originsValue) 
             ? originsValue.Split(',', StringSplitOptions.RemoveEmptyEntries) 
             : new[] { "http://localhost:5173", "http://localhost:3000" };
