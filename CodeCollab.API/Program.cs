@@ -85,6 +85,8 @@ builder.Services.AddCors(opts =>
             ? originsValue.Split(',', StringSplitOptions.RemoveEmptyEntries) 
             : new[] { "http://localhost:5173", "http://localhost:3000" };
 
+        Console.WriteLine($"CORS Policy: Allowing [{string.Join(", ", origins)}]");
+
         policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
