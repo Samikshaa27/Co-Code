@@ -16,6 +16,7 @@ async function request(method, path, body, token, signal = null) {
     method: fetchMethod,
     headers,
     signal,
+    credentials: 'include', // Required since backend has AllowCredentials()
     body: (fetchMethod !== 'GET' && body) ? JSON.stringify(body) : undefined,
   });
 
