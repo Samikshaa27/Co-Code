@@ -9,6 +9,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ensure DateTime Compatibility for Postgres
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // Check for API Key at startup
 var apiKey = builder.Configuration["Groq:ApiKey"] ?? builder.Configuration["OpenAI:ApiKey"];
 if (string.IsNullOrEmpty(apiKey))
@@ -119,12 +122,13 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        db.Database.Migrate();
+        // Force a fresh schema creation with the new UUID mappings
+        db.Database.EnsureCreated();
     }
     catch (Exception ex)
     {
         var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        log.LogError(ex, "Migration failed — continuing anyway");
+        log.LogError(ex, "Schema creation failed — continuing anyway");
     }
 }
 
