@@ -137,8 +137,8 @@ app.Use(async (context, next) =>
     if (!string.IsNullOrEmpty(origin) && origin.Contains("vercel.app"))
     {
         context.Response.Headers.AccessControlAllowOrigin = origin;
-        context.Response.Headers.AccessControlAllowHeaders = "*";
-        context.Response.Headers.AccessControlAllowMethods = "*";
+        context.Response.Headers.AccessControlAllowHeaders = "Content-Type, Authorization, Accept, X-Requested-With";
+        context.Response.Headers.AccessControlAllowMethods = "GET, POST, PUT, DELETE, OPTIONS";
         context.Response.Headers.AccessControlAllowCredentials = "true";
     }
 
