@@ -57,7 +57,11 @@ builder.Services.AddDbContext<AppDbContext>(opts =>
 });
 
 // ── Authentication ────────────────────────────────────────────────────────────
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-dev-key-change-in-production-32c";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("CRITICAL: JWT Key is not configured. Please set 'Jwt:Key' in appsettings.json or environment variables.");
+}
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opts =>
     {
@@ -190,10 +194,11 @@ app.Use(async (context, next) =>
     {
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
+        var isDev = context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
         await context.Response.WriteAsJsonAsync(new { 
-            error = ex.Message, 
-            detail = ex.InnerException?.Message,
-            stackTrace = ex.StackTrace 
+            error = isDev ? ex.Message : "An internal server error occurred.",
+            detail = isDev ? ex.InnerException?.Message : null,
+            stackTrace = isDev ? ex.StackTrace : null
         });
     }
 });

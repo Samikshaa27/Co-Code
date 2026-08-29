@@ -1,16 +1,34 @@
-# React + Vite
+# Co-Code Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for Co-Code, built with React, Vite, and Monaco Editor.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend provides a real-time collaborative coding environment. It connects to the ASP.NET Core backend to manage rooms, synchronize code edits using Yjs over SignalR, and interact with AI coding assistants.
 
-## React Compiler
+## Key Technologies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19**
+- **Vite**: Fast build tool and dev server.
+- **Zustand**: Lightweight global state management.
+- **Monaco Editor**: Provides a rich, VS Code-like editing experience.
+- **Yjs & y-monaco**: Handles Conflict-Free Replicated Data Types (CRDTs) for seamless multi-user collaboration.
+- **SignalR**: Manages WebSocket connections for real-time document synchronization.
 
-## Expanding the ESLint configuration
+## Setup & Running Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+The app will typically be available at `http://localhost:5173`.
+
+## Environment & Proxy
+
+In development, the Vite server (`vite.config.js`) is configured to proxy API requests (`/api`) and WebSocket connections (`/hubs`) to the backend running at `http://127.0.0.1:5099`. You do not need to configure hardcoded backend URLs for local development.
+
+For production, ensure the backend URL is properly configured based on your hosting environment.

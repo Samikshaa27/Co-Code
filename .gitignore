@@ -54,3 +54,8 @@ tmp/
 brain/
 artifacts/
 logs/
+
+# Co-Code Local Files
+CodeCollab.API/codecollab.db
+CodeCollab.API/*.txt
+frontend/*.txt

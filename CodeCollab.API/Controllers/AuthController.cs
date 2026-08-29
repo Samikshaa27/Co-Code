@@ -38,7 +38,11 @@ public class AuthController : ControllerBase
         // Create session in DB
         await _roomService.CreateSessionAsync(roomGuid, request.DisplayName, color, ct);
 
-        var jwtKey = _config["Jwt:Key"] ?? "super-secret-dev-key-change-in-production-32c";
+        var jwtKey = _config["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new InvalidOperationException("CRITICAL: JWT Key is not configured.");
+        }
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
